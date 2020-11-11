@@ -1,5 +1,7 @@
 import { Button, Layer, ButtonInterface } from 'elgato-stream-deck-utils';
 import { readFileSync } from 'fs';
+import { resolve } from 'path';
+
 // @ts-ignore
 import moment from 'moment';
 
@@ -17,8 +19,8 @@ export class TogglActivateButton extends Button implements ButtonInterface {
   constructor(layerSize: number, apiToken: string) {
     super(layerSize);
     this.togglClient = new TogglClient({ apiToken });
-    this.togglImageActive = readFileSync('images/toggl_active.png');
-    this.togglImageInactive = readFileSync('images/toggl_deactivated.png');
+    this.togglImageActive = readFileSync(resolve(__dirname, '../images/toggl_active.png'));
+    this.togglImageInactive = readFileSync(resolve(__dirname, '../images/toggl_deactivated.png'));
     this.removeKeyUpToogleHandler = () => {};
   }
 
