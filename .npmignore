@@ -1,4 +1,5 @@
 **.*
 !dist/**
 !dist/**.js
+!images/**.*
 **.spec.js
