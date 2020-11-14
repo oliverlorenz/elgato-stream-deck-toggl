@@ -106,7 +106,6 @@ export class ToggleHandler {
   }
 
   async stop() {
-    console.log('stop()');
     if (await this.isRunning()) {
       this.togglClient.stopTimeEntry(
         this.toggleTimeEntryId,
@@ -119,5 +118,32 @@ export class ToggleHandler {
         },
       );
     }
+  }
+
+  async getFromTo(startDate: Date, endDate: Date): Promise<number> {
+    const timeEntries = await new Promise(
+      (
+        resolve: (timeEntries: { duration: number; stop?: Date }[]) => void,
+        reject: (err: Error) => void,
+      ) => {
+        this.togglClient.getTimeEntries(
+          startDate,
+          endDate,
+          (err: Error | undefined, timeEntries: { duration: number }[]) => {
+            if (err) return reject(err);
+            return resolve(timeEntries);
+          },
+        );
+      },
+    );
+    let duration = 0;
+    timeEntries.forEach(timeEntry => {
+      if (timeEntry.duration > 0) {
+        duration += timeEntry.duration;
+      } else if (timeEntry.duration < 0 && timeEntry.stop === undefined) {
+        duration += Math.floor(Date.now() / 1000 + timeEntry.duration);
+      }
+    });
+    return duration;
   }
 }

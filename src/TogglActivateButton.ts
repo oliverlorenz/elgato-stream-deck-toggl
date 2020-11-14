@@ -109,7 +109,6 @@ export class TogglActivateButton extends Button implements ButtonInterface {
   }
 
   stop() {
-    console.log('ä stop');
     this.togglHandler.stop();
   }
 }
