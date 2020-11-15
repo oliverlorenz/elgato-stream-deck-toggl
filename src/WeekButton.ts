@@ -4,6 +4,7 @@ import { FromToButton } from './FromToButton';
 
 export class WeekButton extends FromToButton {
   constructor(layerSize: number, apiToken: string) {
-    super(layerSize, apiToken, 'week');
+    // @ts-ignore
+    super(layerSize, apiToken, 'isoweek');
   }
 }

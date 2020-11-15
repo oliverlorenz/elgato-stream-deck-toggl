@@ -1,4 +1,4 @@
-import { Button, Layer, ButtonInterface } from 'elgato-stream-deck-utils';
+import { Button, Layer, ButtonInterface, TextOptions } from 'elgato-stream-deck-utils';
 
 // @ts-ignore
 import moment from 'moment';
@@ -8,7 +8,12 @@ export class FromToButton extends Button implements ButtonInterface {
   private interval: NodeJS.Timeout | undefined;
   private togglHandler: ToggleHandler;
 
-  constructor(layerSize: number, apiToken: string, private unit: moment.unitOfTime.StartOf) {
+  constructor(
+    layerSize: number,
+    apiToken: string,
+    private unit: moment.unitOfTime.StartOf,
+    private textOptions?: TextOptions,
+  ) {
     super(layerSize);
     this.togglHandler = new ToggleHandler(apiToken);
   }
@@ -25,28 +30,25 @@ export class FromToButton extends Button implements ButtonInterface {
     return this.layer(0);
   }
 
-  async activate() {
+  private async updateText() {
     const duration = await this.togglHandler.getFromTo(
       moment().startOf(this.unit).toDate(),
       moment().endOf(this.unit).toDate(),
     );
-    this.textLayer.image.setText(
-      `${this.unit}:<br />${this.getTimeString(moment.duration(duration, 'seconds'))}`,
-      {
-        color: 'white',
-        size: 20,
-      },
-    );
+    this.textLayer.image.setText(this.getTimeString(moment.duration(duration, 'seconds')), {
+      color: 'white',
+      size: 30,
+      textAnchor: 'middle',
+      dominantBaseline: 'middle',
+      ...this.textOptions,
+    });
+  }
+
+  async activate() {
+    await this.updateText();
 
     this.interval = setInterval(async () => {
-      const duration = await this.togglHandler.getFromTo(
-        moment().startOf(this.unit).toDate(),
-        moment().endOf(this.unit).toDate(),
-      );
-      this.textLayer.image.setText(this.getTimeString(moment.duration(duration, 'seconds')), {
-        color: 'white',
-        size: 20,
-      });
+      await this.updateText();
     }, 5000);
     super.activate();
   }
